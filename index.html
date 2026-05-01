@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Money HQ" />
+<title>Money HQ</title>
+<style>
+:root{
+  --bg:#020617;
+  --card:#111827;
+  --card2:#0f172a;
+  --text:#f8fafc;
+  --muted:#cbd5e1;
+  --blue:#38bdf8;
+  --green:#22c55e;
+  --yellow:#f59e0b;
+  --red:#ef4444;
+  --purple:#a78bfa;
+  --border:#1f2937;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  padding:calc(14px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,#020617,#0f172a);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
+h1{font-size:30px;margin:0 0 4px}
+h2{font-size:20px;margin:0 0 12px}
+h3{margin:14px 0 8px}
+p{color:var(--muted)}
+.header{margin-bottom:14px}
+.sub{margin:0;color:var(--muted);font-size:14px}
+.grid{display:grid;gap:12px}
+.card{
+  background:rgba(17,24,39,.95);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:15px;
+  box-shadow:0 12px 24px rgba(0,0,0,.25);
+}
+.statgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stat{
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:12px;
+}
+.stat .label{color:var(--muted);font-size:13px}
+.stat .value{font-size:22px;font-weight:800;margin-top:4px}
+.green{color:var(--green)}.red{color:var(--red)}.yellow{color:var(--yellow)}.blue{color:var(--blue)}.purple{color:var(--purple)}
+button,input,select,textarea{
+  font:inherit;
+}
+button{
+  border:0;
+  border-radius:12px;
+  padding:11px 13px;
+  background:var(--blue);
+  color:#00111c;
+  font-weight:800;
+  cursor:pointer;
+  margin:4px 4px 4px 0;
+}
+button.secondary{background:#334155;color:white}
+button.greenbtn{background:var(--green);color:#02130a}
+button.yellowbtn{background:var(--yellow);color:#170d00}
+button.redbtn{background:var(--red);color:white}
+input,select,textarea{
+  width:100%;
+  padding:11px;
+  margin:5px 0 10px;
+  border-radius:12px;
+  border:1px solid #334155;
+  background:#020617;
+  color:white;
+}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tablewrap{overflow:auto;border-radius:14px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;min-width:640px;background:#020617}
+th,td{padding:10px;border-bottom:1px solid #1f2937;text-align:left;font-size:14px}
+th{color:#e2e8f0;background:#0f172a;position:sticky;top:0}
+.small{font-size:12px;color:var(--muted)}
+.report-box{
+  background:#020617;
+  color:white;
+  border:1px solid var(--border);
+  padding:16px;
+  border-radius:14px;
+  margin-top:12px;
+}
+.report-line{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid #1f2937;padding:8px 0}
+.report-line strong{color:#e5e7eb}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#1e293b;color:#cbd5e1;font-size:12px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.tabbtn{background:#1e293b;color:white}
+.tabbtn.active{background:var(--blue);color:#00111c}
+.view{display:none}.view.active{display:block}
+@media(min-width:760px){.grid.two{grid-template-columns:1fr 1fr}.statgrid{grid-template-columns:repeat(4,1fr)}}
+@media print{
+  body{background:white;color:black;padding:20px}
+  .no-print,.tabs,.data-entry,.tablewrap{display:none!important}
+  .card,.report-box{background:white;color:black;border:1px solid #bbb;box-shadow:none}
+  p,.sub,.small{color:black}
+  .report-line{border-bottom:1px solid #ddd}
+}
+</style>
+</head>
+<body>
+  <div class="header no-print">
+    <h1>Money HQ</h1>
+    <p class="sub">Personal finance dashboard with reports, print, and spreadsheet export.</p>
+  </div>
+
+  <div class="tabs no-print">
+    <button class="tabbtn active" onclick="showView('dashboard', this)">Dashboard</button>
+    <button class="tabbtn" onclick="showView('transactions', this)">Transactions</button>
+    <button class="tabbtn" onclick="showView('reports', this)">Reports</button>
+    <button class="tabbtn" onclick="showView('settings', this)">Settings</button>
+  </div>
+
+  <section id="dashboard" class="view active grid">
+    <div class="card">
+      <h2>Latest Month Snapshot</h2>
+      <div class="statgrid">
+        <div class="stat"><div class="label">Income</div><div id="dashIncome" class="value green">$0.00</div></div>
+        <div class="stat"><div class="label">Expenses</div><div id="dashExpenses" class="value red">$0.00</div></div>
+        <div class="stat"><div class="label">Leftover</div><div id="dashLeftover" class="value blue">$0.00</div></div>
+        <div class="stat"><div class="label">Transactions</div><div id="dashCount" class="value yellow">0</div></div>
+      </div>
+      <p class="small">This updates automatically from saved transactions.</p>
+    </div>
+  </section>
+
+  <section id="transactions" class="view grid two">
+    <div class="card data-entry">
+      <h2>Add Transaction</h2>
+      <label>Date</label>
+      <input type="date" id="txDate" />
+      <label>Description</label>
+      <input id="txDesc" placeholder="Example: Duke Energy" />
+      <div class="row">
+        <div>
+          <label>Amount</label>
+          <input id="txAmount" type="number" step="0.01" placeholder="Use negative for expense" />
+        </div>
+        <div>
+          <label>Category</label>
+          <select id="txCategory">
+            <option>Income</option>
+            <option>Utilities</option>
+            <option>Groceries</option>
+            <option>Fast Food</option>
+            <option>Amazon</option>
+            <option>Insurance</option>
+            <option>Credit Cards</option>
+            <option>Loans</option>
+            <option>Auto Payments</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <button onclick="addTransaction()">Add Transaction</button>
+      <button class="secondary" onclick="loadSampleData()">Load Sample Data</button>
+      <button class="redbtn" onclick="clearTransactions()">Clear All</button>
+      <p class="small">Bank statement auto-import can be added later. This version gives you the report engine now.</p>
+    </div>
+
+    <div class="card">
+      <h2>Transaction List</h2>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Amount</th><th></th></tr></thead>
+          <tbody id="txTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="reports" class="view grid">
+    <div class="card no-print">
+      <h2>Reports Center</h2>
+      <label>Select Month</label>
+      <input type="month" id="reportMonth" />
+      <button onclick="createMonthlyReport()">Create Report</button>
+      <button class="yellowbtn" onclick="printReport()">Print Report</button>
+      <button class="greenbtn" onclick="exportReportCSV()">Export Spreadsheet CSV</button>
+      <button class="secondary" onclick="exportTransactionsCSV()">Export All Transactions</button>
+    </div>
+    <div class="card" id="reportCard">
+      <h2>Monthly Report</h2>
+      <div id="reportOutput"><p class="small">Choose a month and tap Create Report.</p></div>
+    </div>
+  </section>
+
+  <section id="settings" class="view grid">
+    <div class="card">
+      <h2>Category Rules</h2>
+      <p class="small">Money HQ can auto-categorize common merchants when transactions are added or imported.</p>
+      <div class="report-line"><strong>Duke Energy, PS&amp;G, Town of Newport</strong><span>Utilities</span></div>
+      <div class="report-line"><strong>Amazon</strong><span>Amazon</span></div>
+      <div class="report-line"><strong>McDonald’s, Wendy’s, Taco Bell, Chick-fil-A</strong><span>Fast Food</span></div>
+      <div class="report-line"><strong>Walmart, Food Lion, Aldi, Publix</strong><span>Groceries</span></div>
+      <div class="report-line"><strong>Geico, USAA, Progressive, State Farm</strong><span>Insurance</span></div>
+    </div>
+  </section>
+
+<script>
+const STORAGE_KEY = "moneyHQ_transactions_v2";
+let transactions = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+let latestReportRows = [];
+
+const categoryRules = [
+  { words:["duke energy","ps&g","pseg","town of newport","water","electric","gas"], category:"Utilities" },
+  { words:["amazon","amzn"], category:"Amazon" },
+  { words:["mcdonald","wendy","taco bell","chick-fil-a","chick fil a","burger king","bojangles","kfc"], category:"Fast Food" },
+  { words:["walmart","food lion","aldi","publix","kroger","lowes foods"], category:"Groceries" },
+  { words:["geico","usaa","progressive","state farm","allstate","insurance"], category:"Insurance" },
+  { words:["capital one","discover","visa payment","mastercard payment","amex","american express"], category:"Credit Cards" },
+  { words:["loan","mortgage","navient","synchrony"], category:"Loans" },
+  { words:["car payment","auto payment","toyota financial","ford credit","gm financial"], category:"Auto Payments" }
+];
+
+function money(n){ return "$" + (Number(n)||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions)); renderTransactions(); updateDashboard(); }
+function autoCategory(desc, fallback){
+  const d = String(desc || "").toLowerCase();
+  for (const rule of categoryRules){ if(rule.words.some(w => d.includes(w))) return rule.category; }
+  return fallback || "Other";
+}
+function showView(id, btn){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+function addTransaction(){
+  const date = document.getElementById('txDate').value;
+  const description = document.getElementById('txDesc').value.trim();
+  const amount = Number(document.getElementById('txAmount').value);
+  let category = document.getElementById('txCategory').value;
+  if(!date || !description || isNaN(amount)){ alert('Please enter date, description, and amount.'); return; }
+  if(category === 'Other') category = autoCategory(description, category);
+  transactions.push({ id: Date.now(), date, description, category, amount });
+  document.getElementById('txDesc').value = '';
+  document.getElementById('txAmount').value = '';
+  save();
+}
+function deleteTx(id){ transactions = transactions.filter(t=>t.id !== id); save(); }
+function renderTransactions(){
+  const tbody = document.getElementById('txTable');
+  tbody.innerHTML = transactions.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(t=>`
+    <tr>
+      <td>${t.date}</td><td>${escapeHtml(t.description)}</td><td><span class="badge">${t.category}</span></td>
+      <td class="${t.amount < 0 ? 'red' : 'green'}">${money(t.amount)}</td>
+      <td><button class="redbtn" onclick="deleteTx(${t.id})">Delete</button></td>
+    </tr>`).join('');
+}
+function escapeHtml(s){ return String(s).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+function getLatestMonth(){
+  if(!transactions.length) return new Date().toISOString().slice(0,7);
+  return transactions.map(t=>t.date.slice(0,7)).sort().pop();
+}
+function monthSummary(month){
+  const categories = {
+    Income:0, Utilities:0, Groceries:0, "Fast Food":0, Amazon:0, Insurance:0,
+    "Credit Cards":0, Loans:0, "Auto Payments":0, Other:0
+  };
+  let count = 0;
+  transactions.forEach(t=>{
+    if(!t.date || !t.date.startsWith(month)) return;
+    count++;
+    const cat = categories.hasOwnProperty(t.category) ? t.category : 'Other';
+    categories[cat] += Number(t.amount)||0;
+  });
+  const income = categories.Income;
+  const expenses = Object.entries(categories).filter(([c])=>c !== 'Income').reduce((s,[,a])=>s+Math.abs(a),0);
+  const leftover = income - expenses;
+  return { month, categories, income, expenses, leftover, count };
+}
+function previousMonth(month){
+  const [y,m] = month.split('-').map(Number);
+  const d = new Date(y, m-2, 1);
+  return d.toISOString().slice(0,7);
+}
+function updateDashboard(){
+  const month = getLatestMonth();
+  const s = monthSummary(month);
+  document.getElementById('dashIncome').textContent = money(s.income);
+  document.getElementById('dashExpenses').textContent = money(s.expenses);
+  document.getElementById('dashLeftover').textContent = money(s.leftover);
+  document.getElementById('dashCount').textContent = s.count;
+  document.getElementById('reportMonth').value = month;
+}
+function createMonthlyReport(){
+  const month = document.getElementById('reportMonth').value;
+  if(!month){ alert('Please select a month first.'); return; }
+  const s = monthSummary(month);
+  const p = monthSummary(previousMonth(month));
+  const utilChange = Math.abs(s.categories.Utilities) - Math.abs(p.categories.Utilities);
+  const expenseChange = s.expenses - p.expenses;
+  latestReportRows = [
+    {month, category:'Income', amount:s.income},
+    ...Object.entries(s.categories).filter(([c])=>c !== 'Income').map(([category,amount])=>({month,category,amount:Math.abs(amount)})),
+    {month, category:'Total Expenses', amount:s.expenses},
+    {month, category:'Leftover', amount:s.leftover},
+    {month, category:'Utilities Change From Previous Month', amount:utilChange},
+    {month, category:'Total Expense Change From Previous Month', amount:expenseChange}
+  ];
+  const lines = Object.entries(s.categories).map(([cat,amt])=>`
+    <div class="report-line"><strong>${cat}</strong><span>${cat === 'Income' ? money(amt) : money(Math.abs(amt))}</span></div>`).join('');
+  document.getElementById('reportOutput').innerHTML = `
+    <div class="report-box">
+      <h2>Money HQ Monthly Report</h2>
+      <p><strong>Month:</strong> ${month}</p>
+      <div class="report-line"><strong>Income</strong><span class="green">${money(s.income)}</span></div>
+      <div class="report-line"><strong>Total Expenses</strong><span class="red">${money(s.expenses)}</span></div>
+      <div class="report-line"><strong>Leftover</strong><span class="blue">${money(s.leftover)}</span></div>
+      <div class="report-line"><strong>Utilities vs Previous Month</strong><span class="${utilChange <= 0 ? 'green' : 'red'}">${utilChange >= 0 ? '+' : ''}${money(utilChange)}</span></div>
+      <div class="report-line"><strong>Total Expenses vs Previous Month</strong><span class="${expenseChange <= 0 ? 'green' : 'red'}">${expenseChange >= 0 ? '+' : ''}${money(expenseChange)}</span></div>
+      <h3>Category Breakdown</h3>
+      ${lines}
+    </div>`;
+}
+function printReport(){ window.print(); }
+function exportReportCSV(){
+  if(!latestReportRows.length){ alert('Create a report first.'); return; }
+  downloadCSV('MoneyHQ_Report.csv', latestReportRows);
+}
+function exportTransactionsCSV(){ downloadCSV('MoneyHQ_All_Transactions.csv', transactions); }
+function downloadCSV(filename, rows){
+  if(!rows.length){ alert('No data to export.'); return; }
+  const headers = Object.keys(rows[0]);
+  const csv = [headers.join(',')].concat(rows.map(row => headers.map(h => csvSafe(row[h])).join(','))).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+function csvSafe(v){
+  const s = String(v ?? '');
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+}
+function clearTransactions(){
+  if(confirm('Clear all saved transactions?')){ transactions = []; save(); document.getElementById('reportOutput').innerHTML='<p class="small">Choose a month and tap Create Report.</p>'; }
+}
+function loadSampleData(){
+  transactions = [
+    {id:1,date:'2026-04-01',description:'Retirement Pay',category:'Income',amount:4200},
+    {id:2,date:'2026-04-03',description:'Duke Energy',category:'Utilities',amount:-185.42},
+    {id:3,date:'2026-04-05',description:'Town of Newport Water',category:'Utilities',amount:-72.16},
+    {id:4,date:'2026-04-07',description:'Amazon Marketplace',category:'Amazon',amount:-84.99},
+    {id:5,date:'2026-04-09',description:'Food Lion',category:'Groceries',amount:-156.78},
+    {id:6,date:'2026-04-10',description:'Chick-fil-A',category:'Fast Food',amount:-18.42},
+    {id:7,date:'2026-04-12',description:'USAA Insurance',category:'Insurance',amount:-214.00},
+    {id:8,date:'2026-04-14',description:'Capital One Payment',category:'Credit Cards',amount:-300.00},
+    {id:9,date:'2026-03-03',description:'Duke Energy',category:'Utilities',amount:-160.00},
+    {id:10,date:'2026-03-05',description:'Town of Newport Water',category:'Utilities',amount:-68.00},
+    {id:11,date:'2026-03-01',description:'Retirement Pay',category:'Income',amount:4200}
+  ];
+  save();
+}
+(function init(){
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('txDate').value = today;
+  renderTransactions(); updateDashboard();
+})();
+</script>
+</body>
+</html>
